@@ -60,7 +60,7 @@ The Connect API v2 offers two mechanisms to interact with Infinite Flight:
 
 ### The API Manifest
 
-Each aircraft offers a different set of states and commands so before interacting with Infinite Flight, before using the states or commands it is important to first obtain the manifest from the API after connecting.
+Each aircraft offers a different set of states and commands so before using the states or commands it is important to first obtain the manifest from the API after connecting.
 
 The manifest is a long  text string containing a series of entries -- one per command or state. Each entry is separated by a newline character.
 
@@ -68,7 +68,7 @@ Each entry contains three fields separated by a comma:
 
 * A numeric ID (32-bit integer) for the state or command which is used to get or set a state or execute a command through the API. These numbers can differ by aircraft.
 * A 32-bit integer indicating the data type used by the state (see "[Data Types](#data-types)" below). For commands, this field will be `-1` rather than an integer indicating a data type.
-* The name of the command or state - a human-friendly means to understand the comamnd's intent. These names will be consistent between aircraft even if the specific set of states and commands available might differ.
+* The name of the command or state - a human-friendly way to understand the comamnd's intent. These names will be consistent between aircraft even if the specific set of states and commands available might differ.
 
 The following is an extract from a typical manifest illustrating this format for several states:
 
@@ -99,7 +99,8 @@ What's notable is that all state names take a format of a series of terms separa
 The following sample illustrates the way commands will appear in the manifest:
 
 ```
-1048649,-1,commands/AutoStart\n
+> It is important to note that currently there are commands which cannot be used -- specifically commands which require data to be passed to them. To illustrate, the command `commands/ParkingBrakes` is a simple toggle: issue the command and the parking brakes switch between off and on. But, other commands clearly don't work that way. For instance, the command `commands/FlightPlan.AddWaypoints` requires a series of waypoints to be provided -- but there is no mechanism in the API to do that currently which renders the commands effectively non-functional at this time. it is expected that in the future Infinite Flight will enable these commands.
+s/AutoStart\n
 1048628,-1,commands/BeaconLights\n
 1048613,-1,commands/Brakes\n
 ...
@@ -244,7 +245,7 @@ The Connect v2 API represents numbers in little-endian format so it is important
 
 ```
 17 02 00 00
-````
+```
 
 Similarly, if the command you are requesting has the numeric ID `1048616`, then its hecadecimal value is `100028` which as a 32-bit *little-endian* integer is represented by:
 
@@ -255,3 +256,160 @@ Similarly, if the command you are requesting has the numeric ID `1048616`, then 
 All numbers use little-endian including *Float,*, *Double,* and *Long* data types.
 
 ### Retrieving States from the API
+
+To fetch a state from the API you need to send a `GetState` request as follows:
+
+* A 32-bit integer indicating the numeric ID of the state being sent.
+* The one-byte boolean `false` (represented as `0`).
+
+For instance, let's assume our manifest contains the following state:
+
+```
+522,4,aircraft/0/livery
+```
+
+This indicates the `aircraft/0/livery` state has a numeric ID of `522` and returns a `String` data type.
+
+If we want to retrieve this state we would send the following:
+
+```
+0a 02 00 00 00
+```
+
+This breaks down as:
+
+* `0a 02 00 00`: The 32-bit little endian integer representation of `522` which has the hexadecimal value `20A`.
+* `00`: A single byte representing `false`.
+
+When the API responds it will return a response which looks like this:
+
+```
+0a 02 00 00 0e 00 00 00 0a 00 00 00 41 65 72 20 4c 69 6e 67 75 73
+```
+
+This breaks down as:
+
+* `0a 02 00 00`: The 32-bit little-endian integer representation of the state's numeric ID `522`.
+* `0e 00 00 00`: The length of the data being returned -- in this case the hexadecimal value `0000000e` is `14` indicating the data is 14-bytes long.
+* `0a 00 00 00 41 65 72 20 ....`: The actual data returned for the state. Since this state is a string, the data breaks down into two parts:
+  * `0a 00 00 00`: A 32-bit little-endian integer indicating the length of the string -- in this case `0000000a` ia `10` indicating the string is 10-bytes long.
+  * `41 65 72 20 4c 69 6e 67 75 73`: The 10-byte string as a series of one-byte characters which represents `Aer Lingus` -- the name of the livery of the aircraft in this case.
+
+This structure of request and response works regardless of the data type in question.
+
+Let's look at an example with a 32-bit integer data type:
+
+```
+622,1,aircraft/0/systems/flaps/state
+```
+
+If we want to retrieve this state we would send the following:
+
+```
+6e 02 00 00 00
+```
+
+This breaks down as:
+
+* `63 02 00 00`: The 32-bit little endian integer representation of `622` which has the hexadecimal value `26E`.
+* `00`: A single byte representing `false`.
+
+When the API responds it will return a response which looks like this:
+
+```
+02 00 00 04 00 00 00 00 00 00 00>
+```
+
+This breaks down as:
+
+* `6e 02 00 00`: The 32-bit little-endian integer representation of the state's numeric ID `622`.
+* `04 00 00 00`: The length of the data being returned -- in this case the hexadecimal value `00000004` is `4` indicating the data is 4-bytes long since 32-bit integers are represented as four bytes.
+* `00 00 00 00`: The actual data returned for the state. Since this state is a 32-bit integer, the value being returned is `0`.
+
+### Setting States with the API
+
+It is possible to set states -- assigning new values to them -- through the API by sending a `SetState` request as outline below.
+
+However, not all states can be set and the manifest offers no indication of which states can be set and which can't. The only way you can determine this is trial-and-error and some common sense.
+
+For instance, a state such as `aircraft/0/livery` can't be set -- it represents the actual livery on the aircraft. Similarly, the state `aircraft/0/latitude` can't be set as it reflects the actual location of the aircraft at a point in time.
+
+By contrast, a state such as `aircraft/0/systems/flaps/state` can be set to change the flap position by setting the state to the number representing the intended flap state (which will differ by aircraft).
+
+To illustrate this, let's set the flap state to `1` using the API. To do this, we need to generate a `SetState` request we send:
+
+* The 32-bit integer representing the numeric ID of the state
+* A boolean value of `true` represented by a one-byte value `1`
+* The actual data itself -- in this case the number `1` as a 32-bit little-endian integer
+
+As with our previous example retrieving the same state, if the numeric ID of the state is `622` then we would send the following to set the state to `1`:
+
+```
+6e 02 00 00 01 01 00 00 00
+```
+
+This breaks down as:
+
+* `6e 02 00 00`: The 32-bit little-endian integer representation of the state's numeric ID `622`.
+* `01`: A single byte representing `true`.
+* `01 00 00 00`: The 32-bit integer representation of the value we want to set for the state (in this case, `1`).
+
+As with retrieving states, the way we represent the value being set will follow the way each [Data Type](#data-types) is represented.
+
+For instance, we can try setting the following state which has a `String` data type:
+
+```
+605,4,aircraft/0/systems/comm_radios/com_1/atc_name
+```
+
+If we wanted to set this value to `Bob the Pilot`, we would send the following request to the API:
+
+```
+5d 02 00 00 01 0d 00 00 00 42 6f 62 20 74 68 65 20 50 69 6c 6f 74
+```
+
+This breaks down as:
+
+* `5d 02 00 00`: The 32-bit little-endian integer representation of the state's numeric ID `605`.
+* `01`: A single byte representing `true`.
+* `0d 00 00 00 42 6f 62 20 ...`: The string data broken down into two parts:
+  * `0d 00 00 00`: A 32-bit little-endian integer indicating the length of the string -- in this case `0000000d` ia `13` indicating the string is 13-bytes long (the number of characters in `Bob the Pilot`).
+  * `42 6f 62 20 74 68 65 20 50 69 6c 6f 74`: The 13-byte string as a series of one-byte characters which represents `Bob the Pilot`.
+
+After sending a request to set a state, the API will not provide any response to indicate the state was set successfully. The only way to be sure if the request succeeded is to subsequently [retrieve the state from the API](#retrieving-states-from-the-api).
+
+### Running Commands through the API
+
+To execute a command through the API you need to send a `RucCommand` request as follows:
+
+* A 32-bit integer indicating the numeric ID of the command being executed.
+* The one-byte boolean `false` (represented as `0`).
+
+For instance, let's assume our manifest contains the following command:
+
+```
+1048614,-1,commands/ParkingBrakes
+```
+
+This indicates the `commands/ParkingBrakes` state has a numeric ID of `1048614`.
+
+If we want to execute this command we would send the following:
+
+```
+26 00 10 00 00
+```
+
+This breaks down as:
+
+* `26 00 10 00`: The 32-bit little endian integer representation of `1048614` which has the hexadecimal value `100026`.
+* `00`: A single byte representing `false`.
+
+This will execue the command and toggle the parking brakes on/off and the user will see this change in Infinite Flight.
+
+As with setting a state, after sending a request to execute a command, the API will not provide any response to indicate the command was executed successfully. The only way to be sure if the request succeeded is to subsequently [retrieve an appropriate state from the API](#retrieving-states-from-the-api) or to visually confirm in Infinite Flight itself.
+
+For instance, if you toggle the parking brakes state as illustrated above you might retrieve the `aircraft/0/systems/parking_brake/state` state to verify the command succeeded.
+
+As mentioned earlier in "[The API Manifest](#the-api-manifest)", currently there are commands returned in the manifest which cannot be used because they required data to be passed to them. The API currently provides no mechanism to do this which renders there comamnds effectively non-functional at this time. It is expected that in the future Infinite Flight will enable these commands.
+
+For example, the command `commands/ParkingBrakes` is a simple toggle: issue the command and the parking brakes switch between off and on. But, other commands clearly don't work that way. For instance, the command `commands/FlightPlan.AddWaypoints` requires a series of waypoints to be provided. The latter cannot be done at this time.
