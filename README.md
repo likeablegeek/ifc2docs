@@ -4,6 +4,22 @@
 
 This version of the API was first included in Infinite Flight 19.4.
 
+## Table of Contents
+
+* [About the API](#about-the-api)
+* [Enabling the API](#enabling-the-api)
+* [Connecting to the API](#connecting-to-the-api)
+  * [Finding an Infinite Flight Device](#finding-an-infinite-flight-device)
+* [Using the API](#using-the-api)
+  * [The API Manifest](#the-api-manifest)
+  * [The Structure of API Request](#the-structure-of-api-requests)
+  * [Obtaining the Manifest](#obtaining-the-manifest)
+  * [Data Types](#data-types)
+    * [Little-Endian](#little-endian)
+  * [Retrieving States from the API](#retrieving-states-from-the-api)
+  * [Setting States with the API](#setting-states-with-the-api)
+  * [Running Commands through the API](#running-commands-through-the-api)
+
 ## About the API
 
 The Connect API v2 is designed to provide a high-performance way to interrogate aircraft and Infinite Flight states, manipulate those states and issue commands to Infinite Flight. The API is designed to be highly responsive so that it can be used for a variety of purposes including controlling aspects of Infinite Flight in "real time" while flights are in progress and creating applications which can respond rapidly to changes in aircraft state.
@@ -34,7 +50,7 @@ Common examples include:
 * Swift: [SwiftSocket](https://github.com/swiftsocket/SwiftSocket)
 * Kotlin: [`java.net.socket`](https://sylhare.github.io/2020/04/07/Kotlin-tcp-socket-example.html)
 
-### Finding an Infinite Flight device
+### Finding an Infinite Flight Device
 
 If you don't know the IP address of the device you want to connect to, you can discover existing Infinite Flight devices on the same local network using UDP. Infinite Flight broadcasts [UDP](https://www.cloudflare.com/en-gb/learning/ddos/glossary/user-datagram-protocol-udp/) packets on port `15000` which provide the IP address of the device among other details. An example UDP broadcast from Infinite Flight looks like this:
 
@@ -99,8 +115,7 @@ What's notable is that all state names take a format of a series of terms separa
 The following sample illustrates the way commands will appear in the manifest:
 
 ```
-> It is important to note that currently there are commands which cannot be used -- specifically commands which require data to be passed to them. To illustrate, the command `commands/ParkingBrakes` is a simple toggle: issue the command and the parking brakes switch between off and on. But, other commands clearly don't work that way. For instance, the command `commands/FlightPlan.AddWaypoints` requires a series of waypoints to be provided -- but there is no mechanism in the API to do that currently which renders the commands effectively non-functional at this time. it is expected that in the future Infinite Flight will enable these commands.
-s/AutoStart\n
+1048649,-1,commands/AutoStart\n
 1048628,-1,commands/BeaconLights\n
 1048613,-1,commands/Brakes\n
 ...
