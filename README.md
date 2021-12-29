@@ -12,7 +12,7 @@ This version of the API was first included in Infinite Flight 19.4.
   * [Finding an Infinite Flight Device](#finding-an-infinite-flight-device)
 * [Using the API](#using-the-api)
   * [The API Manifest](#the-api-manifest)
-  * [The Structure of API Request](#the-structure-of-api-requests)
+  * [The Structure of API Requests](#the-structure-of-api-requests)
   * [Obtaining the Manifest](#obtaining-the-manifest)
   * [Data Types](#data-types)
     * [Little-Endian](#little-endian)
