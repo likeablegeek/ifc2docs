@@ -226,7 +226,7 @@ As discussed previously, states in the manifest each have an associated data typ
 </thead>
 <tbody>
 <tr>
-<td data-label="Integer">0</td><td data-label="Type">Boolean</td><td>Single byte representing `true` with `01` and `false` with `00`.</td></tr>
+<td data-label="Integer">0</td><td data-label="Type">Boolean</td><td>Single byte representing <code>true</code> with <code>01</code> and <code>false</code> with <code>00</code>.</td></tr>
 <tr><td data-label="Integer">1</td><td data-label="Type">Integer (32-bit)</td><td>32-bit Integer represented as four bytes in little-endian format (see "<a href="#little-endian">Little-Endian</a>" below). Can store numbers in the range -2,147,483,648 to 2,147,483,647.</td></tr>
 <tr><td data-label="Integer">2</td><td data-label="Type">Float</td><td>Floating point number represented as four bytes in <a href="#little-endian">little-endian</a> format. Can represent 6 to 7 decimal digits.</td></tr>
 <tr><td data-label="Integer">3</td><td data-label="Type">Double</td><td>Floating point number represented as eight bytes in <a href="#little-endian">little-endian</a> format. Can represent 15 decimal digits.</td></tr>
