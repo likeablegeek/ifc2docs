@@ -1,3 +1,5 @@
+> This document has been written by [@likeablegeek](https://www.likeablegeek.com) to extend the documentation for the [Infinite Flight Connect API v2](https://infiniteflight.com/guide/developer-reference/connect-api/version-2) as a contribution to the Infinite Flight developer community. They may be freely shared under the [Creative Commons Attribution 4.0 International (CC BY 4.0) license](https://creativecommons.org/licenses/by/4.0/).
+
 # Connect API v2
 
 This version of the API was first included in Infinite Flight 19.4.
