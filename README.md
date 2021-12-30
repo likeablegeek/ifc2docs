@@ -9,16 +9,16 @@ This version of the API was first included in Infinite Flight 19.4.
 * [About the API](#about-the-api)
 * [Enabling the API](#enabling-the-api)
 * [Connecting to the API](#connecting-to-the-api)
-  * [Finding an Infinite Flight Device](#finding-an-infinite-flight-device)
+    * [Finding an Infinite Flight Device](#finding-an-infinite-flight-device)
 * [Using the API](#using-the-api)
-  * [The API Manifest](#the-api-manifest)
-  * [The Structure of API Requests](#the-structure-of-api-requests)
-  * [Obtaining the Manifest](#obtaining-the-manifest)
-  * [Data Types](#data-types)
-    * [Little-Endian](#little-endian)
-  * [Retrieving States from the API](#retrieving-states-from-the-api)
-  * [Setting States with the API](#setting-states-with-the-api)
-  * [Running Commands through the API](#running-commands-through-the-api)
+    * [The API Manifest](#the-api-manifest)
+    * [The Structure of API Requests](#the-structure-of-api-requests)
+    * [Obtaining the Manifest](#obtaining-the-manifest)
+    * [Data Types](#data-types)
+        * [Little-Endian](#little-endian)
+    * [Retrieving States from the API](#retrieving-states-from-the-api)
+    * [Setting States with the API](#setting-states-with-the-api)
+    * [Running Commands through the API](#running-commands-through-the-api)
 
 ## About the API
 
@@ -54,12 +54,10 @@ Common examples of modules/packages which can be used to establish TCP socket co
 
 If  the IP address of the device to connect to is unknown, it is possible to discover existing Infinite Flight devices on the same local network using UDP. Infinite Flight broadcasts [UDP](https://www.cloudflare.com/en-gb/learning/ddos/glossary/user-datagram-protocol-udp/) packets on port `15000` which provide the IP address of the device among other details. An example UDP broadcast from Infinite Flight looks like this:
 
-```
-["State": Playing, "Port": 10111, "DeviceID": iPad7, "Aircraft": Cessna 172,
-"Version": 19.4.7354.25209, "DeviceName": Thomas’s iPad,
-"Addresses":("fe80::1c79:baf4:f9f1:dd59%3", "192.168.1.26"),
-"Livery": Civil Air Patrol]
-```
+    ["State": Playing, "Port": 10111, "DeviceID": iPad7, "Aircraft": Cessna 172,
+    "Version": 19.4.7354.25209, "DeviceName": Thomas’s iPad,
+    "Addresses":("fe80::1c79:baf4:f9f1:dd59%3", "192.168.1.26"),
+    "Livery": Civil Air Patrol]
 
 From this information IPv4 or IPv6 addresses for the device can be extracted as well as information about the version of Infinite Flight in use, the current aircraft and livery, and the type of device. The port indicated will be `10111` which is the port for the [Connect API v1](https://infiniteflight.com/guide/developer-reference/connect-api/version-1). **To connect to the v2 API, connect to port `10112` as mentioned above in "[Connecting to the API](#connecting-to-the-api)".**
 
@@ -68,10 +66,10 @@ From this information IPv4 or IPv6 addresses for the device can be extracted as 
 The Connect API v2 offers two mechanisms to interact with Infinite Flight:
 
 * **States**: States are used to retrieve or set specific aspects of a flight's, aircraft's or Infinite Flight's current active state. These are broken down into several groupings:
-  * `aircraft`: Everything from the aircraft's altitude, heading, bank and pitch to the position of flaps, the aircraft's livery, and autopilot settings.
-  * `infiniteflight`: Settings related to the state of Infinite Flight itself such as the current camera views and angles as well as the current version of Infinite Flight being used.
-  * `api_joystick`: A set of states related to joystick support in Infinite Flight.
-  * Miscellaneous: Miscellaneous other states related to the environment (such as wind speed), the simulator itself (such as current length of flight) and other one-off states.
+    * `aircraft`: Everything from the aircraft's altitude, heading, bank and pitch to the position of flaps, the aircraft's livery, and autopilot settings.
+    * `infiniteflight`: Settings related to the state of Infinite Flight itself such as the current camera views and angles as well as the current version of Infinite Flight being used.
+    * `api_joystick`: A set of states related to joystick support in Infinite Flight.
+    * Miscellaneous: Miscellaneous other states related to the environment (such as wind speed), the simulator itself (such as current length of flight) and other one-off states.
 * **Commands**: Commands are used to replicate actions typically taken in the Infinite Flight user interface such as toggling the parking brakes, moving the camera, starting and stopping engines, moving flaps, raising landing gear and more.
 
 ### The API Manifest
@@ -88,15 +86,13 @@ Each entry contains three fields separated by a comma:
 
 The following is an extract from a typical manifest illustrating this format for several states:
 
-```
-632,4,aircraft/0/flightplan/route\n
-539,2,aircraft/0/groundspeed\n
-548,2,aircraft/0/heading_magnetic\n
-556,0,aircraft/0/is_on_ground\n
-554,3,aircraft/0/latitude\n
-555,3,aircraft/0/longitude\n
-...
-```
+    632,4,aircraft/0/flightplan/route\n
+    539,2,aircraft/0/groundspeed\n
+    548,2,aircraft/0/heading_magnetic\n
+    556,0,aircraft/0/is_on_ground\n
+    554,3,aircraft/0/latitude\n
+    555,3,aircraft/0/longitude\n
+    ...
 
 > *In this example, the text is split after each newline (`\n`) for readability -- the actual text won't have have an additional line break after the newline character.*
 
@@ -114,12 +110,10 @@ What's notable is that all state names take a format of a series of terms separa
 
 The following sample illustrates the way commands will appear in the manifest:
 
-```
-1048649,-1,commands/AutoStart\n
-1048628,-1,commands/BeaconLights\n
-1048613,-1,commands/Brakes\n
-...
-```
+    1048649,-1,commands/AutoStart\n
+    1048628,-1,commands/BeaconLights\n
+    1048613,-1,commands/Brakes\n
+    ...
 
 What's notable is that there are some key factors which distinguish commands from states in the manifest:
 
@@ -143,9 +137,7 @@ For example, referring to the sample manifest examples above, to get the current
 
 This means sending the following five bytes:
 
-```
-2A 02 00 00 00
-```
+    2A 02 00 00 00
 
 > This series of bytes is represented in hexadecimal notation each from `00` to `FF`.
 
@@ -176,9 +168,7 @@ This is done by sending the special command `-1` followed by `false` (or `0`) to
 
 In practice this means sending this series of bytes:
 
-```
-ff ff ff ff 00
-```
+    ff ff ff ff 00
 
 Here, `ff ff ff ff` is the 32-bit little endian hexadecimal representation of `-1` and the fifth byte is the `0` marker.
 
@@ -187,28 +177,26 @@ The API will return the manifest in this way:
 * `-1` to indicate the API is returning manifest data, followed by
 * A 32-bit [little-endian](#little-endian) integer indicating the total length of the data being returned
 * The manifest data itself broken down as follows:
-  * A 32-bit integer indicating the length of the string itself in bytes
-  * The string data itself as a series of bytes
+    * A 32-bit integer indicating the length of the string itself in bytes
+    * The string data itself as a series of bytes
 
 As an example, the following is the first 50 bytes of a manifest returned by the API:
 
-```
-ff ff ff ff 13 b7 00 00 0f b7
-00 00 35 31 35 2c 32 2c 61 69
-72 63 72 61 66 74 2f 30 2f 73
-79 73 74 65 6d 73 2f 6e 61 76
-5f 73 6f 75 72 63 65 73 2f 61
-64 66 2f 32 2f 64 69 73 74 61
-...
-```
+    ff ff ff ff 13 b7 00 00 0f b7
+    00 00 35 31 35 2c 32 2c 61 69
+    72 63 72 61 66 74 2f 30 2f 73
+    79 73 74 65 6d 73 2f 6e 61 76
+    5f 73 6f 75 72 63 65 73 2f 61
+    64 66 2f 32 2f 64 69 73 74 61
+    ...
 
 Breaking this down, the data is structured like this:
 
 * `ff ff ff ff`: This is the representation of the integer `-1` indicating this is a response to the request for the manifest.
 * `13 b7 00 00`: This is the size of the total data returned as a 32-bit [little-endian](#little-endian) integer -- in this case the hexadecimal number `0000b713` indicates the total data to follow is 46,867 bytes.
 * `0f b7 00 00 35 31 35 2c ...`: The manifest itself broken down into two parts:
-  * `0f b7 00 00`: This is the first part of the manifest data: a 32-bit [little-endian](#little-endian) integer indicating the length of the manifest string which follows. In this case the hexadecimal number `0000b70f` indicates the length of manifest string is 46,863 bytes.
-  * `35 31 35 2c 32 2c 61 69 72 63 72 61 66 74 2f 30 2f 73 ...`: The start of the actual bytes of the manifest string. This series of bytes are the hexadeciaml representations of ASCII characters -- in this case these bytes are `515,2,aircraft/0/s ...` which is clearly the first part of an entry in the manifest.
+    * `0f b7 00 00`: This is the first part of the manifest data: a 32-bit [little-endian](#little-endian) integer indicating the length of the manifest string which follows. In this case the hexadecimal number `0000b70f` indicates the length of manifest string is 46,863 bytes.
+    * `35 31 35 2c 32 2c 61 69 72 63 72 61 66 74 2f 30 2f 73 ...`: The start of the actual bytes of the manifest string. This series of bytes are the hexadeciaml representations of ASCII characters -- in this case these bytes are `515,2,aircraft/0/s ...` which is clearly the first part of an entry in the manifest.
 
 An important point is that the entire manifest will not be returned in one large message. It will likely be returned in multiple messages so it is necessary to append these messages to the end of the manifest data until the entire string length indicated in the third integer has been received (`0f b7 00 00` in this example).
 
@@ -241,33 +229,23 @@ As discussed previously, states in the manifest each have an associated data typ
 
 Consider this hexadecimal number representing the 32-bit integer 1,210,590:
 
-```
-001278DE
-```
+    001278DE
 
 *Big-endian* means the bytes are represented left-to-right from the most significant byte to least significant as in:
 
-```
-00 12 78 DE
-```
+    00 12 78 DE
 
 By comparison, *little-endian* reverses this order to:
 
-```
-DE 78 12 00
-```
+    DE 78 12 00
 
 The Connect v2 API represents numbers in little-endian format so it is important when sending requests to represent states or commands as 32-bit little-endian integers. For instance, if the state being requested has the numeric ID `535`, then its hexadecimal value is `217` which as a 32-bit little-endian integer is represented by:
 
-```
-17 02 00 00
-```
+    17 02 00 00
 
 Similarly, if the command being requested has the numeric ID `1048616`, then its hecadecimal value is `100028` which as a 32-bit *little-endian* integer is represented by:
 
-```
-28 00 10 00
-```
+    28 00 10 00
 
 All numbers use little-endian including *Float,* *Double,* and *Long* data types.
 
@@ -280,17 +258,13 @@ To fetch a state from the API, send a `GetState` request as follows:
 
 For instance, asssume the manifest contains the following state:
 
-```
-522,4,aircraft/0/livery
-```
+    522,4,aircraft/0/livery
 
 This indicates the `aircraft/0/livery` state has a numeric ID of `522` and returns a `String` data type.
 
 To retrieve this state, would send the following:
 
-```
-0a 02 00 00 00
-```
+    0a 02 00 00 00
 
 This breaks down as:
 
@@ -299,31 +273,25 @@ This breaks down as:
 
 When the API responds it will return a response which looks like this:
 
-```
-0a 02 00 00 0e 00 00 00 0a 00 00 00 41 65 72 20 4c 69 6e 67 75 73
-```
+    0a 02 00 00 0e 00 00 00 0a 00 00 00 41 65 72 20 4c 69 6e 67 75 73
 
 This breaks down as:
 
 * `0a 02 00 00`: The 32-bit [little-endian](#little-endian) integer representation of the state's numeric ID `522`.
 * `0e 00 00 00`: The length of the data being returned as a 32-bit [little-endian](#little-endian) integer-- in this case the hexadecimal value `0000000e` is `14` indicating the data is 14-bytes long.
 * `0a 00 00 00 41 65 72 20 ....`: The actual data returned for the state. Since this state is a string, the data breaks down into two parts:
-  * `0a 00 00 00`: A 32-bit [little-endian](#little-endian) integer indicating the length of the string -- in this case `0000000a` is `10` indicating the string is 10-bytes long.
-  * `41 65 72 20 4c 69 6e 67 75 73`: The 10-byte string as a series of one-byte characters which represents `Aer Lingus` -- the name of the livery of the aircraft in this case.
+    * `0a 00 00 00`: A 32-bit [little-endian](#little-endian) integer indicating the length of the string -- in this case `0000000a` is `10` indicating the string is 10-bytes long.
+    * `41 65 72 20 4c 69 6e 67 75 73`: The 10-byte string as a series of one-byte characters which represents `Aer Lingus` -- the name of the livery of the aircraft in this case.
 
 This structure of request and response works regardless of the data type in question.
 
 Let's look at an example with a 32-bit integer data type:
 
-```
-622,1,aircraft/0/systems/flaps/state
-```
+    622,1,aircraft/0/systems/flaps/state
 
 To retrieve this state, send the following:
 
-```
-6e 02 00 00 00
-```
+    6e 02 00 00 00
 
 This breaks down as:
 
@@ -332,9 +300,7 @@ This breaks down as:
 
 When the API responds it will return a response which looks like this:
 
-```
-02 00 00 04 00 00 00 00 00 00 00>
-```
+    02 00 00 04 00 00 00 00 00 00 00>
 
 This breaks down as:
 
@@ -360,9 +326,7 @@ To illustrate this, let's set the flap state to `1` using the API. To do this, g
 
 As with the previous example retrieving the same state, if the numeric ID of the state is `622` then send following to set the state to `1`:
 
-```
-6e 02 00 00 01 01 00 00 00
-```
+    6e 02 00 00 01 01 00 00 00
 
 This breaks down as:
 
@@ -374,23 +338,19 @@ As with retrieving states, the way to represent the value being set will follow 
 
 For instance, the following state has a `String` data type:
 
-```
-605,4,aircraft/0/systems/comm_radios/com_1/atc_name
-```
+    605,4,aircraft/0/systems/comm_radios/com_1/atc_name
 
 To set this value to `Bob the Pilot`, send the following request to the API:
 
-```
-5d 02 00 00 01 0d 00 00 00 42 6f 62 20 74 68 65 20 50 69 6c 6f 74
-```
+    5d 02 00 00 01 0d 00 00 00 42 6f 62 20 74 68 65 20 50 69 6c 6f 74
 
 This breaks down as:
 
 * `5d 02 00 00`: The 32-bit [little-endian](#little-endian) integer representation of the state's numeric ID `605`.
 * `01`: A single byte representing `true`.
 * `0d 00 00 00 42 6f 62 20 ...`: The string data broken down into two parts:
-  * `0d 00 00 00`: A 32-bit [little-endian](#little-endian) integer indicating the length of the string -- in this case `0000000d` is `13` indicating the string is 13-bytes long (the number of characters in `Bob the Pilot`).
-  * `42 6f 62 20 74 68 65 20 50 69 6c 6f 74`: The 13-byte string as a series of one-byte characters which represents `Bob the Pilot`.
+    * `0d 00 00 00`: A 32-bit [little-endian](#little-endian) integer indicating the length of the string -- in this case `0000000d` is `13` indicating the string is 13-bytes long (the number of characters in `Bob the Pilot`).
+    * `42 6f 62 20 74 68 65 20 50 69 6c 6f 74`: The 13-byte string as a series of one-byte characters which represents `Bob the Pilot`.
 
 After sending a request to set a state, the API will not provide any response to indicate the state was set successfully. The only way to be sure if the request succeeded is to subsequently [retrieve the state from the API](#retrieving-states-from-the-api).
 
@@ -403,17 +363,13 @@ To execute a command through the API, send a `RucCommand` request as follows:
 
 For instance, assume the manifest contains the following command:
 
-```
-1048614,-1,commands/ParkingBrakes
-```
+    1048614,-1,commands/ParkingBrakes
 
 This indicates the `commands/ParkingBrakes` state has a numeric ID of `1048614`.
 
 To execute this command, send the following:
 
-```
-26 00 10 00 00
-```
+    26 00 10 00 00
 
 This breaks down as:
 
