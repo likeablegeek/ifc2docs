@@ -45,14 +45,14 @@ How this is done depends on the language/platform being used to connect to the A
 Common examples of modules/packages which can be used to establish TCP socket connections include:
 
 * JavaScript (Node): Node's [`net` module](https://nodejs.org/api/net.html)
-* C#: [TcpClient](https://docs.microsoft.com/en-us/dotnet/api/system.net.sockets.tcpclient?view=net-6.0)
+* C#: [`TcpClient`](https://docs.microsoft.com/en-us/dotnet/api/system.net.sockets.tcpclient?view=net-6.0)
 * Python: [`socket` module](https://docs.python.org/3/library/socket.html)
 * Swift: [SwiftSocket](https://github.com/swiftsocket/SwiftSocket)
 * Kotlin: [`java.net.socket`](https://sylhare.github.io/2020/04/07/Kotlin-tcp-socket-example.html)
 
 ### Finding an Infinite Flight Device
 
-If  the IP address of the device to connect to is unknown, it is possible to discover existing Infinite Flight devices on the same local network using UDP. Infinite Flight broadcasts [UDP](https://www.cloudflare.com/en-gb/learning/ddos/glossary/user-datagram-protocol-udp/) packets on port `15000` which provide the IP address of the device among other details. An example UDP broadcast from Infinite Flight looks like this:
+If the IP address of the device to connect to is unknown, it is possible to discover existing Infinite Flight devices on the same local network using UDP. Infinite Flight broadcasts [UDP](https://www.cloudflare.com/en-gb/learning/ddos/glossary/user-datagram-protocol-udp/) packets on port `15000` which provide the IP address of the device among other details. An example UDP broadcast from Infinite Flight looks like this:
 
     ["State": Playing, "Port": 10111, "DeviceID": iPad7, "Aircraft": Cessna 172,
     "Version": 19.4.7354.25209, "DeviceName": Thomas’s iPad,
@@ -60,6 +60,16 @@ If  the IP address of the device to connect to is unknown, it is possible to dis
     "Livery": Civil Air Patrol]
 
 From this information IPv4 or IPv6 addresses for the device can be extracted as well as information about the version of Infinite Flight in use, the current aircraft and livery, and the type of device. The port indicated will be `10111` which is the port for the [Connect API v1](https://infiniteflight.com/guide/developer-reference/connect-api/version-1). **To connect to the v2 API, connect to port `10112` as mentioned above in "[Connecting to the API](#connecting-to-the-api)".**
+
+The details of how to receive these UDP packet broadcasts depends on the language/platform being used.
+
+Common examples of modules/packages which can be used to listen for and receive these UDP packet broadcasts include:
+
+* JavaScript (Node): Node's [`dgram` module](https://nodejs.org/api/dgram.html)
+* C#: [`UdpClient`](https://docs.microsoft.com/en-us/dotnet/api/system.net.sockets.udpclient?view=net-6.0)
+* Python: [`socket` module](https://docs.python.org/3/library/socket.html)
+* Swift: [Swift's `NWListener` class](https://developer.apple.com/documentation/network/nwlistener)
+* Kotlin: [`java.net.DatagramSocket`](https://docs.oracle.com/javase/7/docs/api/java/net/DatagramSocket.html)
 
 ## Using the API
 
